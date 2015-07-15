@@ -7,12 +7,51 @@ output:
 
 
 ## Loading and preprocessing the data
+The first step for this peer assessment is be the loading and preprocessing of the data (if needed). Please, keep in mind here that I'm assuming that the markdown file is in the same directory as the zipped data file. If this is not the case, the code chunks will not run properly.
 
+After forking and clonning the repository, the data will be in a zipped file called *activity.zip*. Thus, we need to unzip the file in order to read it properly. I will use *unz* for this. Besides, I'm using variables to store the names of the files, as this allow me to re-use code chunks for similar problems. 
 
+````{r}
+zipFilePath <- "./activity.zip"
+csvFileName <- "activity.csv"
+unzippedFile <- unz(zipFilePath, csvFileName)
+rawActData <- read.csv(unzippedFile)
+```
+
+After loading the data, we can take a kick look at how the data looks like. For example, we can see the head of the dataset:
+
+```{r}
+head(rawActData)
+```
+
+And, since we see some *NAs* in there, we can use *summary* in order to have some information about relevant parameters about the data:
+
+```{r}
+summary(rawActData)
+```
+
+With this, we have a clear idea about how the data like, and we can move forward to the next step of the processing, which is calculating the mean total number of steps taken per day. No pre-processing has been needed, since the data seems to be in a pretty good shape. 
 
 ## What is mean total number of steps taken per day?
+In order to get the mean total number of steps taken per day, I will follow the instructions in the description of the assessment. Besides, I will also ignore the missing values in the dataset.
+
+1. Calculate the total number of steps taken per day: 
+I'll use some of the functions that are available in the dplyr library, thus, I need to load this library first in order to make use of them. After that I will use a combination of summarise and group_by to get the total number of steps taken per day. Finally, I will use more 'friendly' names for the data.frame containing the total number of steps per day, so it can be used later to calculate the histogram. Again, I show the head of the data.frame with the total steps per day to see how it looks like.
+
+```{r}
+library(dplyr)
+totalStepsByDay <- summarise(group_by(rawActData,date),sum(steps))
+names(totalStepsByDay) <- c("date","steps")
+head(totalStepsByDay)
+```
 
 
+2. The next step is to make a histogram of the total number of steps taken each day
+For this, I only need to plot the histogram of the total steps taken each day, usign *hist*. I've used 10 breaks since this value allows a clean representation of the histogram. Besides, I've used colors and put a nice main title and xaxis title, so the figure is more readable. I will use the base plotting system since it gives good enough results.
+
+```{r}
+hist(totalStepsByDay$steps,10, col="blue", main = "Histogram for the total number of steps taken each day", xlab="Total number of steps taken each day")
+```
 
 ## What is the average daily activity pattern?
 
