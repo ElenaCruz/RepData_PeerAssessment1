@@ -1,4 +1,9 @@
-# Reproducible Research: Peer Assessment 1
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    keep_md: true
+---
 
 
 ## Loading and preprocessing the data
@@ -60,22 +65,6 @@ I'll use some of the functions that are available in the dplyr library, thus, I 
 
 ```r
 library(dplyr)
-```
-
-```
-## 
-## Attaching package: 'dplyr'
-## 
-## The following object is masked from 'package:stats':
-## 
-##     filter
-## 
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union
-```
-
-```r
 totalStepsByDay <- summarise(group_by(rawActData,date),sum(steps))
 names(totalStepsByDay) <- c("date","steps")
 head(totalStepsByDay)
@@ -102,13 +91,79 @@ For this, I only need to plot the histogram of the total steps taken each day, u
 hist(totalStepsByDay$steps,10, col="blue", main = "Histogram for the total number of steps taken each day", xlab="Total number of steps taken each day")
 ```
 
-![](PA1_template_files/figure-html/unnamed-chunk-5-1.png) 
+![plot of chunk plothist](figure/plothist-1.png) 
+
+3. After we have the histogram, we calcualte the mean and median of the total number of steps taken per day, usign standard R functions. As it was indicated in the assessment instructions, I'm ignoring the missing values in the dataset for now, so I'll set the *na.rm* parameter to TRUE in both cases
+
+To calculate the mean and the median of the total number of steps taken per day, I'll use the following R calls: 
+
+```r
+meanTotSteps <- mean(totalStepsByDay$steps, na.rm=TRUE)
+medianTotSteps <- median(totalStepsByDay$steps, na.rm=TRUE)
+```
+
+After this code has been executed, the resulting values are 10766.19 for the mean and 10765 for the median. 
 
 ## What is the average daily activity pattern?
+To calculate the average daily activity pattern, I'll follow the steps indicated in the asssessment description: 
+
+1. I'm making a time series plot of the 5-minute interval and the average number of steps taken, averaged across all days. To get this plot, I need to get the average number of steps taken across all days. As a previous step here, I need to remove the NAs, since they won't allow me to calculate the mean for each interval (this wasn't needed in the first scenario, as we were adding up the values). There are NAs only in the steps values. Thus, I'll get a 'clean' dataset using only the complete cases and ignore the NAs by removing them. Once I have the clean dataset, I just group the values by interval and summarise usign the mean. Finally, I just use prettier names and print the head of the resulting data frame to see how it looks like:
 
 
+```r
+cleanActData <- rawActData[complete.cases(rawActData),]
+cleanAvgStepsByInterval <- summarise(group_by(cleanActData,interval),mean(steps))
+names(cleanAvgStepsByInterval) <- c("interval","steps")
+head(cleanAvgStepsByInterval)
+```
+
+```
+## Source: local data frame [6 x 2]
+## 
+##   interval     steps
+## 1        0 1.7169811
+## 2        5 0.3396226
+## 3       10 0.1320755
+## 4       15 0.1509434
+## 5       20 0.0754717
+## 6       25 2.0943396
+```
+
+Once I have the dataset, I plot it. Since the intervals ae not exactly in a time-series like format, I perform some transformation first, so the X axis shows hours of the day, instead the raw interval values. A base plot is enough here.
+
+
+```r
+times <- strptime(sprintf("%04d", cleanAvgStepsByInterval$interval), format="%H%M",tz="GMT")
+plot(times,cleanAvgStepsByInterval$steps,type="l", col="blue", xlab="Time intervals", ylab="Average number of steps", main="Average number of steps taken per time interval")
+```
+
+![plot of chunk plotintervals](figure/plotintervals-1.png) 
+
+2. Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
+This question can be easily answered by just calculating the maximum of the steps and see which is the corresponding interval. By simple inspection of the plot above, we can infer this maximum should be between 8:00 and 9:00 in the morning, but we will obtain the rigth time interval by using the following code:
+
+
+```r
+cleanAvgStepsByInterval[which(cleanAvgStepsByInterval$steps == max(cleanAvgStepsByInterval$steps)),]$interval
+```
+
+```
+## [1] 835
+```
+ 
+Thus, the 5-minute interval which on average contains the maximum number of steps is the 08:35 one, which confirms that our assumption by looking at the figure was right. Note that I've used some text conversions here to write the interval in a HH:MM way. To do this, I've used the following code snippet:
+
+
+```r
+gsub('^([0-9]{2})([0-9]+)$', '\\1:\\2',sprintf("%04d", cleanAvgStepsByInterval[which(cleanAvgStepsByInterval$steps == max(cleanAvgStepsByInterval$steps)),]$interval))
+```
+
+```
+## [1] "08:35"
+```
 
 ## Imputing missing values
+
 
 
 
