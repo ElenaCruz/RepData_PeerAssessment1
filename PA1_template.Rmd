@@ -148,3 +148,36 @@ I've obtained a value of `r meanTotCompletedSteps`for the mean and a value of `r
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+To answer this question, I'll follow the steps indicated in the assessment description:
+1. Create a new factor variable in the dataset with two levels – “weekday” and “weekend” indicating whether a given date is a weekday or weekend day.
+
+As indicated, I'll use the *weekday* function, combined with *ifelse*, so I can substitute the right values. Besides, I'll use *mutate* to add the new factor variable to the dataset, and, of course, *factor* to convert the character variable to a factor. 
+Please keep in mind that I'm Spanish and my locale is es_ES, that's why I need to use "sábado" and "domingo" as days for the weekend, otherwise, I'd need to change my locale to use "Saturday" and "Sunday". The new factor variable will be called "isWeekday"
+
+```{r addweekday}
+completedData  <- mutate(completedData, isWeekday=factor(ifelse(weekdays(as.Date(completedData$date)) %in% c("sábado","domingo"), "weekend", "weekday")))
+```
+
+We can see how the first rows of the dataset look like with the newly added isWeekday column:
+
+```{r seeisweekday}
+head(completedData)
+```
+
+Finally, we only need to make the panel plot:
+
+2. Make a panel plot containing a time series plot (i.e. type = "l") of the 5-minute interval (x-axis) and the average number of steps taken, averaged across all weekday days or weekend days (y-axis). 
+
+To get the data I need, I'll use the following code, which includes also a visualization of the fisrt rows of the modified dataset:
+```{r getdatapanel}
+completedAvgStepsByInterval <- summarise(group_by(completedData,interval,isWeekday),mean(steps))
+names(completedAvgStepsByInterval) <- c("interval","isWeekday","steps")
+head(completedAvgStepsByInterval)
+```
+
+And, as a last step, I'll use lattice to make a panel plot similar to the one included in the README.md file:
+```{r plotlattice}
+library(lattice)
+xyplot(steps~interval|isWeekday,completedAvgStepsByInterval,type="l", layout=c(1,2), xlab="Interval", ylab="Number of steps")
+```
+
