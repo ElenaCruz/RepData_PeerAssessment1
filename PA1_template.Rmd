@@ -146,7 +146,7 @@ meanTotCompletedSteps <- mean(totalCompletedStepsByDay$steps)
 medianTotCompletedSteps <- median(totalCompletedStepsByDay$steps)
 ```
 
-I've obtained a value of`r sprintf("%.2f", meanTotCompletedSteps)` for the mean and a value of `rsprintf("%.2f", medianTotCompletedSteps)` for the median. As you can see, the mean is exactly the same as for the estimates in the first part of the exercise while the median is slightly different. Besides, the histogram shape is similar, but the box for the central values is larger (which is totally reasonable). Thus no large impact is obtained by imputting missing data for this scenario. 
+I've obtained a value of `r sprintf("%.2f", meanTotCompletedSteps)` for the mean and a value of `r sprintf("%.2f", medianTotCompletedSteps)` for the median. As you can see, the mean is exactly the same as for the estimates in the first part of the exercise while the median is slightly different. Besides, the histogram shape is similar, but the box for the central values is larger (which is totally reasonable). Thus no large impact is obtained by imputting missing data for this scenario. 
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
